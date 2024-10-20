@@ -40,7 +40,7 @@
       window.location.href = 'https://www.redcross.org';
     };
 
-    const nearbyDisaster = disasters.find((disaster) => {
+    const nearbyDisaster = location && disasters.find((disaster) => {
       if (location.latitude !== undefined && location.longitude !== undefined && disaster.location) {
         const distance = calculateDistance(
           { lat: location.latitude, lng: location.longitude },
