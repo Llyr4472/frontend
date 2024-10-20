@@ -16,21 +16,20 @@
           style={{ 
             width: '150px', 
             height: '60px', 
-            fontSize: '1.4rem', 
+            fontSize: '1rem', 
             fontWeight: 'bold', 
             textTransform: 'uppercase', 
             border: 'none', 
             left: '20px', 
             bottom: '20px', 
             zIndex: 1050,
-            backgroundColor: '#4d4dff',
-            color: '#9c9ce4',
+            backgroundColor: '#9c9ce4',
           }} 
           data-bs-toggle="modal" 
           data-bs-target="#reportDisasterModal"
         >
           <i className="bi me-2"></i>
-          Report
+          Report Disaster
         </button>
         <div className="modal fade modern-modal" id="reportDisasterModal" tabIndex={-1} aria-labelledby="reportDisasterModalLabel" aria-hidden="true">
           <div className="modal-dialog modal-dialog-centered">
