@@ -12,11 +12,11 @@
           `}
         </style>
         <button 
-          className="btn btn-danger rounded-pill btn-lg shadow-lg pulse-animation position-fixed d-flex align-items-center justify-content-center hover-effect" 
+          className="btn rounded-pill btn-lg position-fixed d-flex align-items-center justify-content-center hover-effect" 
           style={{ 
             width: '150px', 
             height: '60px', 
-            fontSize: '1rem', 
+            fontSize: '1.4rem', 
             fontWeight: 'bold', 
             textTransform: 'uppercase', 
             border: 'none', 
@@ -24,13 +24,13 @@
             bottom: '20px', 
             zIndex: 1050,
             backgroundColor: '#4d4dff',
-            color: '#000033'
+            color: '#9c9ce4',
           }} 
           data-bs-toggle="modal" 
           data-bs-target="#reportDisasterModal"
         >
           <i className="bi me-2"></i>
-          Report Disaster
+          Report
         </button>
         <div className="modal fade modern-modal" id="reportDisasterModal" tabIndex={-1} aria-labelledby="reportDisasterModalLabel" aria-hidden="true">
           <div className="modal-dialog modal-dialog-centered">

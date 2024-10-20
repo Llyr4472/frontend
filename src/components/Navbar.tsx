@@ -1,6 +1,6 @@
 import "./../global.css";
-
 import { Link } from "react-router-dom";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 interface Alert {
   type: string;
@@ -14,9 +14,7 @@ interface LeftSidebarProps {
   onAlertClick: (alert: Alert) => void;
 }
 
-const Navbar: React.FC<LeftSidebarProps> = ({
-  onSearch,
-}) => {
+const Navbar: React.FC<LeftSidebarProps> = ({ onSearch }) => {
   return (
     <nav
       className="navbar navbar-expand-lg fixed-top px-4 my-3 mx-3 rounded-pill"
@@ -82,7 +80,7 @@ const Navbar: React.FC<LeftSidebarProps> = ({
               >
                 <li>
                   <a
-                    className="dropdown-item text-light hover-effect rounded-5"
+                    className="dropdown-item text-light rounded-5 highlighted-hover"
                     href="#"
                   >
                     Earthquake
@@ -90,7 +88,7 @@ const Navbar: React.FC<LeftSidebarProps> = ({
                 </li>
                 <li>
                   <a
-                    className="dropdown-item text-light hover-effect rounded-5"
+                    className="dropdown-item text-light highlighted-hover rounded-5"
                     href="#"
                   >
                     Flood
@@ -98,7 +96,7 @@ const Navbar: React.FC<LeftSidebarProps> = ({
                 </li>
                 <li>
                   <a
-                    className="dropdown-item text-light hover-effect rounded-5"
+                    className="dropdown-item text-light highlighted-hover rounded-5"
                     href="#"
                   >
                     Hurricane
@@ -106,7 +104,7 @@ const Navbar: React.FC<LeftSidebarProps> = ({
                 </li>
                 <li>
                   <a
-                    className="dropdown-item text-light hover-effect rounded-5"
+                    className="dropdown-item text-light highlighted-hover rounded-5"
                     href="#"
                   >
                     Wildfire
@@ -117,7 +115,7 @@ const Navbar: React.FC<LeftSidebarProps> = ({
                 </li>
                 <li>
                   <a
-                    className="dropdown-item text-light hover-effect rounded-5"
+                    className="dropdown-item text-light highlighted-hover rounded-5"
                     href="#"
                   >
                     All Disasters
@@ -139,14 +137,14 @@ const Navbar: React.FC<LeftSidebarProps> = ({
           <div className="d-flex align-items-center">
             <form className="d-flex me-2" role="search">
               <input
-                className="form-control me-2 bg-light text-dark border-0 rounded-pill hover-effect search-bar"
+                className="form-control me-2 border-0 rounded-pill hover-effect search-bar"
                 type="search"
                 placeholder="Search alerts..."
                 aria-label="Search"
-                style={{ fontFamily: "monospace", width: "250px" }}
+                style={{ fontFamily: "monospace", width: "250px"}}
               />
               <button
-                className="btn btn-outline-light rounded-pill hover-effect"
+                className="btn btn-outline-light rounded-pill hover-effect  "
                 type="submit"
                 onClick={() => {
                   const searchInput = document.querySelector(
@@ -161,17 +159,12 @@ const Navbar: React.FC<LeftSidebarProps> = ({
               </button>
             </form>
           </div>
-          <Link to="/login" className="btn rounded-circle hover-effect ms-3">
-            <img
-              src="/assets/user.svg"
-              alt="Login"
-              className="user-icon"
+          <Link to="/login" className="hover-effect ms-3">
+            <AccountCircleIcon
               style={{
-                width: "40px",
-                height: "40px",
-                backgroundColor: "#4d4dff",
-                borderRadius: "100%",
-                padding: "2px",
+                width: "45px",
+                height: "45px",
+                color: "#9c9ce4",
               }}
             />
           </Link>
