@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Alert } from "../types";
+import { Disaster } from "../types/disaster";
 
 interface AlertsProps {
-  recentAlerts: Alert[];
+  recentAlerts: Disaster[];
 }
 
 function Alerts({ recentAlerts }: AlertsProps) {
@@ -70,9 +70,9 @@ function Alerts({ recentAlerts }: AlertsProps) {
         <ul style={{ listStyleType: "none", padding: 0 }}>
           {recentAlerts.map((alert, index) => (
             <li key={index} style={{ marginBottom: "10px", fontSize: "14px" }}>
-              <span style={{ color: "#8080ff" }}>[{alert.time}]</span>{" "}
+              <span style={{ color: "#8080ff" }}>[{alert.date}]</span>{" "}
               <span style={{ color: "#b3b3ff" }}>{alert.type}</span>:{" "}
-              {alert.location}
+              {alert.location.name}
             </li>
           ))}
         </ul>
