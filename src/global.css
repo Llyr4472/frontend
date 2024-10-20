@@ -11,6 +11,16 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+.highlighted-hover:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: rgba(128, 128, 128, 0.2) !important;
+}
+
+.highlighted-hover{
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
 .searchbar {
     backdrop-filter: blur(10px);
     background-color: rgba(0, 0, 51, 0.7);  
@@ -78,5 +88,3 @@ body {
   /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
 }
-
-
