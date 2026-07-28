@@ -1,145 +1,90 @@
-  import React from 'react';
-  import { Alert as MuiAlert, AlertProps, Box, Button, IconButton, Typography } from '@mui/material';
-  import CloseIcon from '@mui/icons-material/Close';
-  import useLocation from '../hooks/useLocation';
-  import useDisasters from '../hooks/useDisasters';
+import React from "react";
+import useLocation from "../hooks/useLocation";
+import useDisasters from "../hooks/useDisasters";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import CloseIcon from "@mui/icons-material/Close";
 
-  interface AlertComponentProps extends AlertProps {
-    radius: number; // in kilometers
-  }
+interface AlertUserProps {
+  radius?: number;
+}
 
-  export const AlertUser: React.FC<AlertComponentProps> = ({ radius, ...props }) => {
-    const location = useLocation();
-    const { disasters, loading, error } = useDisasters();
-    const [isOpen, setIsOpen] = React.useState(true);
+export const AlertUser: React.FC<AlertUserProps> = ({ radius = 1000 }) => {
+  const userLoc = useLocation();
+  const { disasters, setSelectedDisaster } = useDisasters();
+  const [dismissed, setDismissed] = React.useState(false);
 
-    const isNearbyDisaster = React.useMemo(() => {
-      if (!location || !disasters || disasters.length === 0) return false;
+  if (dismissed || !userLoc) return null;
 
-      return disasters.some((disaster) => {
-        if (location.latitude !== undefined && location.longitude !== undefined && disaster.location) {
-          const distance = calculateDistance(
-            { lat: location.latitude, lng: location.longitude },
-            {lat: disaster.location.latitude, lng: disaster.location.longitude}
-          );
-          return distance <= radius;
-        }
-        return false;
-      });
-    }, [location, disasters, radius]);
+  const nearby = disasters.map((alert) => {
+    const R = 6371;
+    const dLat = ((alert.location.latitude - userLoc.latitude) * Math.PI) / 180;
+    const dLon = ((alert.location.longitude - userLoc.longitude) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((userLoc.latitude * Math.PI) / 180) *
+        Math.cos((alert.location.latitude * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const dist = Math.round(R * c);
+    return { ...alert, dist };
+  }).filter((a) => a.dist <= radius);
 
-    if (loading) return <MuiAlert severity="info">Loading disaster information...</MuiAlert>;
-    if (error) return <MuiAlert severity="error">Error: {error}</MuiAlert>;
-    if (!isNearbyDisaster || !isOpen) return null;
+  if (nearby.length === 0) return null;
 
-    const handleClose = () => {
-      setIsOpen(false);
-    };
+  const closest = nearby.sort((a, b) => a.dist - b.dist)[0];
 
-    const handleEmergencyResource = () => {
-      window.location.href = 'https://www.redcross.org';
-    };
-
-    const nearbyDisaster = location && disasters.find((disaster) => {
-      if (location.latitude !== undefined && location.longitude !== undefined && disaster.location) {
-        const distance = calculateDistance(
-          { lat: location.latitude, lng: location.longitude },
-          {lat: disaster.location.latitude, lng: disaster.location.longitude}
-        );
-        return distance <= radius;
-      }
-      return false;
-    });
-
-    return (
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bgcolor: 'error.main',
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: "76px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        zIndex: 1050,
+        background: "#fef2f2",
+        border: "1px solid #fca5a5",
+        borderRadius: "12px",
+        padding: "10px 18px",
+        boxShadow: "0 10px 25px rgba(220, 38, 38, 0.12)",
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        maxWidth: "600px",
+        width: "90%",
+      }}
+    >
+      <WarningAmberIcon style={{ color: "#dc2626", fontSize: "22px" }} />
+      <div style={{ flex: 1, fontSize: "12.5px" }}>
+        <strong style={{ color: "#dc2626" }}>Proximity Warning: {closest.type} ({closest.dist} km away)</strong>
+        <div style={{ color: "#475569" }}>
+          {closest.title || closest.location.name}. Stay vigilant and monitor local advisories.
+        </div>
+      </div>
+      <button
+        onClick={() => setSelectedDisaster(closest)}
+        style={{
+          background: "#dc2626",
+          border: "none",
+          color: "#ffffff",
+          padding: "5px 12px",
+          borderRadius: "6px",
+          fontSize: "11.5px",
+          fontWeight: 600,
+          cursor: "pointer",
+          whiteSpace: "nowrap",
         }}
       >
-        <IconButton
-          aria-label="close"
-          color="inherit"
-          size="large"
-          onClick={handleClose}
-          sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            bgcolor: 'rgba(255, 255, 255, 0.2)',
-            '&:hover': {
-              bgcolor: 'rgba(255, 255, 255, 0.3)',
-            },
-          }}
-        >
-          <CloseIcon fontSize="large" />
-        </IconButton>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '80%', maxWidth: '600px' }}>
-          <MuiAlert
-            severity="error"
-            variant="filled"
-            sx={{
-              width: '100%',
-              fontSize: '1.5rem',
-              '& .MuiAlert-icon': {
-                fontSize: '2rem',
-              },
-            }}
-            {...props}
-          >
-            WARNING: There is a disaster reported near your location. Please stay alert and follow local authorities' instructions immediately.
-          </MuiAlert>
-          {nearbyDisaster && (
-            <Box sx={{ mt: 2, bgcolor: 'rgba(255, 255, 255, 0.9)', p: 2, borderRadius: 2 }}>
-              <Typography variant="h6" gutterBottom>Disaster Details:</Typography>
-              <Typography><strong>Type:</strong> {nearbyDisaster.type}</Typography>
-              <Typography><strong>Severity:</strong> {nearbyDisaster.severity}</Typography>
-              <Typography><strong>Location:</strong> {nearbyDisaster.location.latitude.toFixed(4)}, {nearbyDisaster.location.longitude.toFixed(4)}</Typography>
-              <Typography><strong>Description:</strong> {nearbyDisaster.description}</Typography>
-            </Box>
-          )}
-          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center', width: '100%' }}>
-            <Button 
-              variant="contained" 
-              color="secondary" 
-              onClick={handleEmergencyResource}
-              sx={{
-                fontSize: '1.2rem',
-                padding: '10px 20px',
-                fontWeight: 'bold',
-                backgroundColor: '#ff9800',
-                '&:hover': {
-                  backgroundColor: '#f57c00',
-                },
-              }}
-            >
-              Emergency Resources
-            </Button>
-          </Box>
-        </Box>
-      </Box>
-    );
-  };
+        Inspect
+      </button>
+      <button
+        onClick={() => setDismissed(true)}
+        style={{ background: "transparent", border: "none", color: "#64748b", cursor: "pointer" }}
+      >
+        <CloseIcon style={{ fontSize: "16px" }} />
+      </button>
+    </div>
+  );
+};
 
-  // Helper function to calculate distance between two points
-  const calculateDistance = (point1: { lat: number; lng: number }, point2: { lat: number; lng: number }): number => {
-    // Haversine formula implementation
-    const R = 6371; // Earth's radius in km
-    const dLat = (point2.lat - point1.lat) * Math.PI / 180;
-    const dLon = (point2.lng - point1.lng) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(point1.lat * Math.PI / 180) * Math.cos(point2.lat * Math.PI / 180) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-  };
+export default AlertUser;
