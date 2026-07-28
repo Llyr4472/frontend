@@ -11,7 +11,7 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem("disalert_user", JSON.stringify({ email, loggedIn: true }));
-    navigate("/home");
+    navigate("/");
   };
 
   return (
@@ -99,7 +99,7 @@ const Login = () => {
             <Link to="/signup" className="text-decoration-none fw-semibold" style={{ color: "#d97706" }}>
               Create Account
             </Link>
-            <Link to="/home" className="text-decoration-none d-flex align-items-center gap-1" style={{ color: "#64748b" }}>
+            <Link to="/" className="text-decoration-none d-flex align-items-center gap-1" style={{ color: "#64748b" }}>
               <ArrowBackIcon style={{ fontSize: "14px" }} />
               Dashboard
             </Link>

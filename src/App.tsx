@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import MyGlobe from "./components/Globe";
 import MapView2D from "./components/MapView2D";
 import Navbar from "./components/Navbar";
@@ -14,7 +14,7 @@ import useDisasters from "./hooks/useDisasters";
 import useLocation from "./hooks/useLocation";
 import { Disaster } from "./types/disaster";
 
-const App = () => {
+const Dashboard = () => {
   const {
     disasters,
     isRefreshing,
@@ -48,95 +48,97 @@ const App = () => {
   };
 
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/" element={<Navigate to="/home" replace />} />
-      <Route
-        path="/home"
-        element={
-          <div id="app-root">
-            {/* Viewport Canvas: 3D Globe or 2D Leaflet Map */}
-            {viewMode === "3d" ? (
-              <MyGlobe
-                recentAlerts={disasters}
-                selectedDisaster={selectedDisaster}
-                onSelectDisaster={handleSelectDisaster}
-                userLocation={
-                  userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
-                }
-                sidebarCollapsed={sidebarCollapsed}
-              />
-            ) : (
-              <MapView2D
-                recentAlerts={disasters}
-                selectedDisaster={selectedDisaster}
-                onSelectDisaster={handleSelectDisaster}
-                userLocation={
-                  userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
-                }
-              />
-            )}
+    <div id="app-root">
+      {/* Viewport Canvas: 3D Globe or 2D Leaflet Map */}
+      {viewMode === "3d" ? (
+        <MyGlobe
+          recentAlerts={disasters}
+          selectedDisaster={selectedDisaster}
+          onSelectDisaster={handleSelectDisaster}
+          userLocation={
+            userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
+          }
+          sidebarCollapsed={sidebarCollapsed}
+        />
+      ) : (
+        <MapView2D
+          recentAlerts={disasters}
+          selectedDisaster={selectedDisaster}
+          onSelectDisaster={handleSelectDisaster}
+          userLocation={
+            userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
+          }
+        />
+      )}
 
-            {/* Top Navigation & Live View Mode Bar */}
-            <Navbar
-              viewMode={viewMode}
-              onToggleViewMode={(mode) => setViewMode(mode)}
-              stats={stats}
-              isRefreshing={isRefreshing}
-              onRefresh={refreshDisasters}
-              onOpenReportModal={() => {
-                setSelectedDisaster(null);
-                setIsReportModalOpen(true);
-              }}
-              lastUpdated={lastUpdated}
-            />
+      {/* Top Navigation & Live View Mode Bar */}
+      <Navbar
+        viewMode={viewMode}
+        onToggleViewMode={(mode) => setViewMode(mode)}
+        stats={stats}
+        isRefreshing={isRefreshing}
+        onRefresh={refreshDisasters}
+        onOpenReportModal={() => {
+          setSelectedDisaster(null);
+          setIsReportModalOpen(true);
+        }}
+        lastUpdated={lastUpdated}
+      />
 
-            {/* Collapsible Command Sidebar Drawer (Stream, Analytics, Safety, Settings) */}
-            <SidebarDrawer
-              recentAlerts={disasters}
-              selectedDisaster={selectedDisaster}
-              onSelectDisaster={handleSelectDisaster}
-              activeCategory={filters.category}
-              onSelectCategory={handleCategorySelect}
-              searchTerm={filters.searchTerm}
-              onSearchChange={handleSearchChange}
-              userLocation={
-                userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
-              }
-              proximityRadius={proximityRadius}
-              onRadiusChange={(r) => setProximityRadius(r)}
-              soundAlertsEnabled={soundAlertsEnabled}
-              onToggleSoundAlerts={() => setSoundAlertsEnabled(!soundAlertsEnabled)}
-              collapsed={sidebarCollapsed}
-              onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-              stats={stats}
-            />
+      {/* Collapsible Command Sidebar Drawer */}
+      <SidebarDrawer
+        recentAlerts={disasters}
+        selectedDisaster={selectedDisaster}
+        onSelectDisaster={handleSelectDisaster}
+        activeCategory={filters.category}
+        onSelectCategory={handleCategorySelect}
+        searchTerm={filters.searchTerm}
+        onSearchChange={handleSearchChange}
+        userLocation={
+          userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
+        }
+        proximityRadius={proximityRadius}
+        onRadiusChange={(r) => setProximityRadius(r)}
+        soundAlertsEnabled={soundAlertsEnabled}
+        onToggleSoundAlerts={() => setSoundAlertsEnabled(!soundAlertsEnabled)}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        stats={stats}
+      />
 
-            {/* Proximity Warning Alert Header */}
-            <AlertUser radius={proximityRadius} />
+      {/* Proximity Warning Alert Header */}
+      <AlertUser radius={proximityRadius} />
 
-            {/* Floating Non-Blocking Bottom Inspector Card */}
-            <HazardInspector
-              disaster={selectedDisaster}
-              onClose={() => setSelectedDisaster(null)}
-              userLocation={
-                userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
-              }
-            />
-
-            {/* User Incident Report Modal */}
-            <Modal
-              isOpen={isReportModalOpen}
-              onClose={() => setIsReportModalOpen(false)}
-              onSubmitReport={addCommunityReport}
-              userCoords={
-                userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
-              }
-            />
-          </div>
+      {/* Floating Non-Blocking Bottom Inspector Card */}
+      <HazardInspector
+        disaster={selectedDisaster}
+        onClose={() => setSelectedDisaster(null)}
+        userLocation={
+          userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
         }
       />
+
+      {/* User Incident Report Modal */}
+      <Modal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        onSubmitReport={addCommunityReport}
+        userCoords={
+          userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
+        }
+      />
+    </div>
+  );
+};
+
+const App = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/home" element={<Dashboard />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="*" element={<Dashboard />} />
     </Routes>
   );
 };

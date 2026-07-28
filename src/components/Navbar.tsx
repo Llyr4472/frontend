@@ -51,7 +51,7 @@ const Navbar: React.FC<NavbarProps> = ({
         {/* Brand Logo & Live Status */}
         <div className="d-flex align-items-center gap-3">
           <Link
-            to="/home"
+            to="/"
             className="navbar-brand text-decoration-none d-flex align-items-center gap-2"
             style={{ color: "#1c1917", fontWeight: 800, fontSize: "19px", letterSpacing: "-0.4px" }}
           >
