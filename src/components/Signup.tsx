@@ -1,92 +1,113 @@
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import PublicIcon from "@mui/icons-material/Public";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const Signup = () => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    localStorage.setItem("disalert_user", JSON.stringify({ email, loggedIn: true }));
+    navigate("/home");
+  };
+
   return (
-    <section className="vh-100 gradient-custom">
-      <div className="container py-5 h-100">
-        <div className="row d-flex justify-content-center align-items-center h-100">
-          <div className="col-12 col-md-8 col-lg-6 col-xl-5">
-            <div
-              className="card bg-dark text-white"
-              style={{ borderRadius: "1rem" }}
-            >
-              <div className="card-body p-5 text-center">
-                <div className="mb-md-5 mt-md-4 pb-5">
-                  <h2 className="fw-bold mb-2 text-uppercase">Sign up</h2>
-                  <p className="text-white-50 mb-5">
-                    Please enter your email and desired password!
-                  </p>
+    <div
+      className="vh-100 w-100 d-flex align-items-center justify-content-center"
+      style={{
+        background: "#f8fafc",
+        color: "#0f172a",
+      }}
+    >
+      <div className="container" style={{ maxWidth: "420px" }}>
+        <div className="panel-minimal p-4 p-md-5 text-center" style={{ background: "#ffffff", border: "1px solid #cbd5e1", boxShadow: "0 12px 36px rgba(15, 23, 42, 0.08)" }}>
+          <div className="d-flex align-items-center justify-content-center gap-2 mb-3">
+            <PublicIcon style={{ color: "#d97706", fontSize: "28px" }} />
+            <h2 className="fw-bold mb-0" style={{ fontSize: "22px", color: "#0f172a", letterSpacing: "-0.4px" }}>
+              Create Account
+            </h2>
+          </div>
 
-                  <div
-                    data-mdb-input-init
-                    className="form-outline form-white mb-4"
-                  >
-                    <input
-                      type="email"
-                      id="typeEmailX"
-                      className="form-control form-control-lg"
-                    />
-                    <label className="form-label" htmlFor="typeEmailX">
-                      Email
-                    </label>
-                  </div>
+          <p className="mb-4" style={{ fontSize: "13px", color: "#64748b" }}>
+            Register to save proximity preferences and submit incident reports.
+          </p>
 
-                  <div
-                    data-mdb-input-init
-                    className="form-outline form-white mb-4"
-                  >
-                    <input
-                      type="password"
-                      id="typePasswordX"
-                      className="form-control form-control-lg"
-                    />
-                    <label className="form-label" htmlFor="typePasswordX">
-                      Password
-                    </label>
-                  </div>
-
-                  <button
-                    data-mdb-button-init
-                    data-mdb-ripple-init
-                    className="btn btn-outline-light btn-lg px-5"
-                    type="submit"
-                  >
-                    Sign up
-                  </button>
-
-                  <div className="d-flex justify-content-center text-center mt-4 pt-1">
-                    <a href="#!" className="text-white">
-                      <i className="fab fa-facebook-f fa-lg"></i>
-                    </a>
-                    <a href="#!" className="text-white">
-                      <i className="fab fa-twitter fa-lg mx-4 px-2"></i>
-                    </a>
-                    <a href="#!" className="text-white">
-                      <i className="fab fa-google fa-lg"></i>
-                    </a>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="mb-0">
-                    Already have an account?{" "}
-                    <Link to="/login" className="text-white-50 fw-bold">
-                      Login
-                    </Link>
-                  </p>
-                </div>
-                <div className="mt-3">
-                  <Link to="/home" className="text-white-50">
-                    Go back to home
-                  </Link>
-                </div>
-              </div>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3 text-start">
+              <label className="form-label fw-semibold" style={{ fontSize: "12px", color: "#475569" }}>
+                Email Address
+              </label>
+              <input
+                type="email"
+                className="form-control"
+                placeholder="name@domain.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                style={{
+                  background: "#f8fafc",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  fontSize: "13px",
+                  borderRadius: "8px",
+                  padding: "10px 12px",
+                }}
+              />
             </div>
+
+            <div className="mb-4 text-start">
+              <label className="form-label fw-semibold" style={{ fontSize: "12px", color: "#475569" }}>
+                Password
+              </label>
+              <input
+                type="password"
+                className="form-control"
+                placeholder="••••••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{
+                  background: "#f8fafc",
+                  border: "1px solid #cbd5e1",
+                  color: "#0f172a",
+                  fontSize: "13px",
+                  borderRadius: "8px",
+                  padding: "10px 12px",
+                }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-amber w-100 py-2.5 fw-bold mb-3"
+              style={{
+                background: "#d97706",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "8px",
+                fontSize: "13px",
+              }}
+            >
+              Complete Registration
+            </button>
+          </form>
+
+          <div className="d-flex justify-content-between align-items-center pt-3 border-top" style={{ borderColor: "#e2e8f0", fontSize: "12.5px" }}>
+            <Link to="/login" className="text-decoration-none fw-semibold" style={{ color: "#d97706" }}>
+              Sign In
+            </Link>
+            <Link to="/home" className="text-decoration-none d-flex align-items-center gap-1" style={{ color: "#64748b" }}>
+              <ArrowBackIcon style={{ fontSize: "14px" }} />
+              Dashboard
+            </Link>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
-}
+};
 
-export default Signup
+export default Signup;
