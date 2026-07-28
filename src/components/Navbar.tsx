@@ -1,176 +1,198 @@
-import "./../global.css";
+import React from "react";
 import { Link } from "react-router-dom";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddIcon from "@mui/icons-material/Add";
+import PublicIcon from "@mui/icons-material/Public";
+import MapIcon from "@mui/icons-material/Map";
 
-interface Alert {
-  type: string;
-  location: string;
-  time: string;
+interface NavbarProps {
+  viewMode: "3d" | "2d";
+  onToggleViewMode: (mode: "3d" | "2d") => void;
+  stats: {
+    total: number;
+    critical: number;
+    high: number;
+    earthquakes: number;
+    wildfires: number;
+  };
+  isRefreshing: boolean;
+  onRefresh: () => void;
+  onOpenReportModal: () => void;
+  lastUpdated: Date;
 }
 
-interface LeftSidebarProps {
-  onSearch: (searchTerm: string) => void;
-  onFilter: (type: string) => void;
-  onAlertClick: (alert: Alert) => void;
-}
-
-const Navbar: React.FC<LeftSidebarProps> = ({ onSearch }) => {
+const Navbar: React.FC<NavbarProps> = ({
+  viewMode,
+  onToggleViewMode,
+  stats,
+  isRefreshing,
+  onRefresh,
+  onOpenReportModal,
+  lastUpdated,
+}) => {
   return (
     <nav
-      className="navbar navbar-expand-lg fixed-top px-4 my-3 mx-3 rounded-pill"
+      className="navbar navbar-expand-lg px-4 py-2"
       style={{
-        backgroundColor: "transparent",
-        backdropFilter: "blur(10px)",
-        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-        fontFamily: "monospace",
+        position: "fixed",
+        top: "16px",
+        left: "20px",
+        width: "calc(100vw - 40px)",
+        background: "rgba(252, 251, 247, 0.96)",
+        backdropFilter: "blur(16px)",
+        border: "1px solid #e2ddd5",
+        borderRadius: "14px",
+        zIndex: 1100,
+        boxShadow: "0 10px 30px rgba(28, 25, 23, 0.08)",
       }}
     >
-      <div className="container-fluid">
-        <a
-          className="navbar-brand fw-bold hover-effect"
-          href="#"
-          style={{ color: "#4d4dff" }}
-        >
-          Disalert
-        </a>
-        <button
-          className="navbar-toggler hover-effect"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item hover-effect">
-              <Link
-                className="nav-link active text-light"
-                aria-current="page"
-                to="/home"
-              >
-                Home
-              </Link>
-            </li>
-            <li className="nav-item hover-effect">
-              <a className="nav-link text-light" href="#">
-                Alerts
-              </a>
-            </li>
-            <li className="nav-item dropdown hover-effect">
-              <a
-                className="nav-link dropdown-toggle text-light"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Disaster Types
-              </a>
-              <ul
-                className="dropdown-menu rounded-5"
-                style={{
-                  backgroundColor: "transparent",
-                  backdropFilter: "blur(10px)",
-                  fontFamily: "monospace",
-                }}
-              >
-                <li>
-                  <a
-                    className="dropdown-item text-light rounded-5 highlighted-hover"
-                    href="#"
-                  >
-                    Earthquake
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="dropdown-item text-light highlighted-hover rounded-5"
-                    href="#"
-                  >
-                    Flood
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="dropdown-item text-light highlighted-hover rounded-5"
-                    href="#"
-                  >
-                    Hurricane
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="dropdown-item text-light highlighted-hover rounded-5"
-                    href="#"
-                  >
-                    Wildfire
-                  </a>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <a
-                    className="dropdown-item text-light highlighted-hover rounded-5"
-                    href="#"
-                  >
-                    All Disasters
-                  </a>
-                </li>
-              </ul>
-            </li>
-            <li className="nav-item hover-effect">
-              <a
-                className="nav-link text-light"
-                href="https://www.redcross.org/get-help.html"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Emergency Resources
-              </a>
-            </li>
-          </ul>
-          <div className="d-flex align-items-center">
-            <form className="d-flex me-2" role="search">
-              <input
-                className="form-control me-2 border-0 rounded-pill hover-effect search-bar"
-                type="search"
-                placeholder="Search alerts..."
-                aria-label="Search"
-                style={{ fontFamily: "monospace", width: "250px"}}
-              />
-              <button
-                className="btn btn-outline-light rounded-pill hover-effect  "
-                type="submit"
-                onClick={() => {
-                  const searchInput = document.querySelector(
-                    'input[type="search"]'
-                  );
-                  if (searchInput instanceof HTMLInputElement) {
-                    onSearch(searchInput.value);
-                  }
-                }}
-              >
-                Search
-              </button>
-            </form>
+      <div className="container-fluid d-flex align-items-center justify-content-between px-0">
+        {/* Brand Logo & Live Status */}
+        <div className="d-flex align-items-center gap-3">
+          <Link
+            to="/home"
+            className="navbar-brand text-decoration-none d-flex align-items-center gap-2"
+            style={{ color: "#1c1917", fontWeight: 800, fontSize: "19px", letterSpacing: "-0.4px" }}
+          >
+            <PublicIcon style={{ color: "#d97706", fontSize: "26px" }} />
+            <span>Disalert</span>
+          </Link>
+
+          {/* Minimal Live Status Badge */}
+          <div
+            className="d-none d-md-flex align-items-center gap-2 px-3 py-1.5 rounded-2"
+            style={{
+              background: "#ecfdf5",
+              border: "1px solid #a7f3d0",
+              fontSize: "12px",
+              color: "#047857",
+              fontWeight: 600,
+            }}
+          >
+            <span className="dot-live"></span>
+            <span>Live Data Feed</span>
+            <span style={{ color: "#d6cebf" }}>•</span>
+            <span style={{ fontSize: "11.5px", color: "#78716c", fontWeight: 500 }}>
+              {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </span>
           </div>
-          <Link to="/login" className="hover-effect ms-3">
-            <AccountCircleIcon
+        </div>
+
+        {/* Spacious 3D / 2D View Switcher */}
+        <div className="d-flex align-items-center rounded-2 p-1" style={{ background: "#f5f2eb", border: "1px solid #e2ddd5" }}>
+          <button
+            onClick={() => onToggleViewMode("3d")}
+            style={{
+              background: viewMode === "3d" ? "#d97706" : "transparent",
+              border: "none",
+              color: viewMode === "3d" ? "#ffffff" : "#44403c",
+              padding: "6px 14px",
+              borderRadius: "6px",
+              fontSize: "12.5px",
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              transition: "all 0.15s ease",
+            }}
+          >
+            <PublicIcon style={{ fontSize: "16px" }} /> 3D Globe
+          </button>
+          <button
+            onClick={() => onToggleViewMode("2d")}
+            style={{
+              background: viewMode === "2d" ? "#d97706" : "transparent",
+              border: "none",
+              color: viewMode === "2d" ? "#ffffff" : "#44403c",
+              padding: "6px 14px",
+              borderRadius: "6px",
+              fontSize: "12.5px",
+              fontWeight: 600,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              transition: "all 0.15s ease",
+            }}
+          >
+            <MapIcon style={{ fontSize: "16px" }} /> 2D Map
+          </button>
+        </div>
+
+        {/* Minimal Stats Indicators */}
+        <div className="d-none d-xl-flex align-items-center gap-2.5" style={{ fontSize: "12.5px" }}>
+          <div className="px-3 py-1.5 rounded-2" style={{ background: "#f5f2eb", border: "1px solid #e2ddd5" }}>
+            <span style={{ color: "#78716c" }}>Total Monitored: </span>
+            <strong style={{ color: "#1c1917" }}>{stats.total}</strong>
+          </div>
+          <div className="px-3 py-1.5 rounded-2" style={{ background: "#fef2f2", border: "1px solid #fca5a5" }}>
+            <span style={{ color: "#dc2626" }}>Critical Hazards: </span>
+            <strong style={{ color: "#dc2626" }}>{stats.critical}</strong>
+          </div>
+        </div>
+
+        {/* Spacious Action Controls */}
+        <div className="d-flex align-items-center gap-3">
+          <button
+            className="btn btn-sm d-flex align-items-center gap-1.5 rounded-2"
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            style={{
+              background: "#f5f2eb",
+              border: "1px solid #e2ddd5",
+              color: "#44403c",
+              padding: "8px 14px",
+              fontSize: "12.5px",
+              fontWeight: 600,
+            }}
+          >
+            <RefreshIcon
               style={{
-                width: "45px",
-                height: "45px",
-                color: "#9c9ce4",
+                fontSize: "16px",
+                transform: isRefreshing ? "rotate(360deg)" : "none",
+                transition: "transform 1s linear",
               }}
             />
+            <span className="d-none d-sm-inline">{isRefreshing ? "Refreshing" : "Refresh"}</span>
+          </button>
+
+          {/* High-Visibility Warm Amber Report Button */}
+          <button
+            onClick={onOpenReportModal}
+            style={{
+              background: "#d97706",
+              color: "#ffffff",
+              border: "none",
+              padding: "8px 18px",
+              borderRadius: "8px",
+              fontSize: "13px",
+              fontWeight: 700,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              boxShadow: "0 4px 12px rgba(217, 119, 6, 0.3)",
+              cursor: "pointer",
+              transition: "transform 0.15s ease",
+            }}
+          >
+            <AddIcon style={{ fontSize: "18px", color: "#ffffff" }} />
+            <span style={{ color: "#ffffff", fontWeight: 700 }}>Report Incident</span>
+          </button>
+
+          <Link
+            to="/login"
+            className="d-flex align-items-center justify-content-center ms-1 text-decoration-none"
+            style={{ color: "#44403c" }}
+            title="Account Profile"
+          >
+            <AccountCircleOutlinedIcon style={{ fontSize: "30px" }} />
           </Link>
         </div>
       </div>
     </nav>
   );
 };
+
 export default Navbar;
