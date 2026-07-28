@@ -1,34 +1,41 @@
-
 import { useState, useEffect } from 'react';
 
-interface Location {
+export interface LocationState {
   latitude: number;
   longitude: number;
+  city?: string;
+  country?: string;
+  isDefault?: boolean;
 }
 
-const useLocation = (): Location | null => {
-  const [location, setLocation] = useState<Location | null>(null);
+const DEFAULT_LOCATION: LocationState = {
+  latitude: 27.7172,
+  longitude: 85.324,
+  city: "Kathmandu",
+  country: "Nepal",
+  isDefault: true,
+};
+
+const useLocation = (): LocationState => {
+  const [location, setLocation] = useState<LocationState>(DEFAULT_LOCATION);
 
   useEffect(() => {
-    const getLocation = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            setLocation({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            });
-          },
-          (error) => {
-            console.error('Error getting location:', error);
-          }
-        );
-      } else {
-        console.error('Geolocation is not supported by this browser.');
-      }
-    };
+    if (!navigator.geolocation) return;
 
-    getLocation();
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          city: "Your Device Location",
+          isDefault: false,
+        });
+      },
+      (error) => {
+        console.warn('Geolocation access failed or denied, using default region:', error.message);
+      },
+      { timeout: 8000, enableHighAccuracy: false }
+    );
   }, []);
 
   return location;
