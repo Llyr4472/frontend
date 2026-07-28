@@ -1,54 +1,140 @@
+import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import MyGlobe from "./components/Globe";
+import MapView2D from "./components/MapView2D";
 import Navbar from "./components/Navbar";
-import Alerts from "./components/Alerts";
+import SidebarDrawer from "./components/SidebarDrawer";
+import HazardInspector from "./components/HazardInspector";
 import Modal from "./components/Modal";
 import Login from "./components/Login";
-import {AlertUser} from "./components/AlertUser";
-
-import useDisaster from './hooks/useDisasters';
-import {
-  Route,
-  Routes,
-  Navigate,
-  } from "react-router-dom";
 import Signup from "./components/Signup";
+import AlertUser from "./components/AlertUser";
+
+import useDisasters from "./hooks/useDisasters";
+import useLocation from "./hooks/useLocation";
+import { Disaster } from "./types/disaster";
 
 const App = () => {
+  const {
+    disasters,
+    isRefreshing,
+    lastUpdated,
+    selectedDisaster,
+    setSelectedDisaster,
+    filters,
+    setFilters,
+    refreshDisasters,
+    addCommunityReport,
+    stats,
+  } = useDisasters();
 
-  const handleSearch = (searchTerm: string) => {
-    console.log("Search:", searchTerm);
+  const userLocation = useLocation();
+  const [viewMode, setViewMode] = useState<"3d" | "2d">("3d");
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [proximityRadius, setProximityRadius] = useState<number>(1000);
+  const [soundAlertsEnabled, setSoundAlertsEnabled] = useState<boolean>(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+
+  const handleSelectDisaster = (disaster: Disaster) => {
+    setSelectedDisaster(disaster);
   };
 
-  const handleFilter = (type: string) => {
-    console.log("Filter:", type);
+  const handleCategorySelect = (category: string) => {
+    setFilters((prev) => ({ ...prev, category }));
   };
 
-  const handleAlertClick = (alert: any) => {
-    console.log("Alert clicked:", alert);
+  const handleSearchChange = (searchTerm: string) => {
+    setFilters((prev) => ({ ...prev, searchTerm }));
   };
-    const {disasters} = useDisaster();
 
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/" element={<Navigate to="/home" replace />} />
-      <Route path="/home" element={
-          <>
-            <div id="app-root">
-              <MyGlobe recentAlerts={disasters} />
-              <Navbar
-                onSearch={handleSearch}
-                onFilter={handleFilter}
-                onAlertClick={handleAlertClick}
+      <Route
+        path="/home"
+        element={
+          <div id="app-root">
+            {/* Viewport Canvas: 3D Globe or 2D Leaflet Map */}
+            {viewMode === "3d" ? (
+              <MyGlobe
+                recentAlerts={disasters}
+                selectedDisaster={selectedDisaster}
+                onSelectDisaster={handleSelectDisaster}
+                userLocation={
+                  userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
+                }
+                sidebarCollapsed={sidebarCollapsed}
               />
-              <Alerts recentAlerts={disasters} />
-            </div>
-            <AlertUser radius={1000} />
-            <div id="modal-root">
-              <Modal />
-            </div>
-          </>
+            ) : (
+              <MapView2D
+                recentAlerts={disasters}
+                selectedDisaster={selectedDisaster}
+                onSelectDisaster={handleSelectDisaster}
+                userLocation={
+                  userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
+                }
+              />
+            )}
+
+            {/* Top Navigation & Live View Mode Bar */}
+            <Navbar
+              viewMode={viewMode}
+              onToggleViewMode={(mode) => setViewMode(mode)}
+              stats={stats}
+              isRefreshing={isRefreshing}
+              onRefresh={refreshDisasters}
+              onOpenReportModal={() => {
+                setSelectedDisaster(null);
+                setIsReportModalOpen(true);
+              }}
+              lastUpdated={lastUpdated}
+            />
+
+            {/* Collapsible Command Sidebar Drawer (Stream, Analytics, Safety, Settings) */}
+            <SidebarDrawer
+              recentAlerts={disasters}
+              selectedDisaster={selectedDisaster}
+              onSelectDisaster={handleSelectDisaster}
+              activeCategory={filters.category}
+              onSelectCategory={handleCategorySelect}
+              searchTerm={filters.searchTerm}
+              onSearchChange={handleSearchChange}
+              userLocation={
+                userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
+              }
+              proximityRadius={proximityRadius}
+              onRadiusChange={(r) => setProximityRadius(r)}
+              soundAlertsEnabled={soundAlertsEnabled}
+              onToggleSoundAlerts={() => setSoundAlertsEnabled(!soundAlertsEnabled)}
+              collapsed={sidebarCollapsed}
+              onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+              stats={stats}
+            />
+
+            {/* Proximity Warning Alert Header */}
+            <AlertUser radius={proximityRadius} />
+
+            {/* Floating Non-Blocking Bottom Inspector Card */}
+            <HazardInspector
+              disaster={selectedDisaster}
+              onClose={() => setSelectedDisaster(null)}
+              userLocation={
+                userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
+              }
+            />
+
+            {/* User Incident Report Modal */}
+            <Modal
+              isOpen={isReportModalOpen}
+              onClose={() => setIsReportModalOpen(false)}
+              onSubmitReport={addCommunityReport}
+              userCoords={
+                userLocation ? { latitude: userLocation.latitude, longitude: userLocation.longitude } : undefined
+              }
+            />
+          </div>
         }
       />
     </Routes>
